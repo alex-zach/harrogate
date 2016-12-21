@@ -67,9 +67,52 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
       });
 
     return users;
+  };
+
+  $scope.reload_users = function() {
+    return AppCatalogProvider.catalog.then(function(app_catalog) {
+      var projects_resource, ref, ref1;
+      projects_resource = (ref = app_catalog['Programs']) != null ? (ref1 = ref.web_api) != null ? ref1.projects : void 0 : void 0;
+      if (projects_resource != null) {
+        console.log("have project_resource");
+        $http.get(projects_resource.uri + '/users').success(function(data, status, headers, config) {
+          $scope.users = Object.keys(data).map(function(user, i) { return {id: i, name: user, data: data[user]}; });
+          $scope.users = sort_users($scope.users);
+          //console.log("setting users to " + $scope.users)
+        });
+
+        return; 
+      }else
+      {
+        console.log("no project_resource");
+      }
+    });
+  };
+
+/*
+  $scope.update_active_user = function(){
+    console.log("update_active_user");
+    $scope.reload_users();
+
+    var projects_resource, ref, ref1;
+
+    if ($location.search().user != null) {
+      (function() {
+        var ref2 = $scope.users;
+        for (var i = 0, len = ref2.length; i < len; i++) {
+          var user = ref2[i];
+          if (user.name === $location.search().user){
+            $scope.active_user = user;
+            break;
+          }
+        }
+      })();
+    }
   }
+*/
 
   $scope.reload_ws = function() {
+    console.log("reload_ws");
     return AppCatalogProvider.catalog.then(function(app_catalog) {
       var projects_resource, ref, ref1;
       projects_resource = (ref = app_catalog['Programs']) != null ? (ref1 = ref.web_api) != null ? ref1.projects : void 0 : void 0;
@@ -99,14 +142,10 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
 
           }
         });
-        $http.get(projects_resource.uri + '/users').success(function(data, status, headers, config) {
-          $scope.users = Object.keys(data).map(function(user, i) { return {id: i, name: user, data: data[user]}; });
-          $scope.users = sort_users($scope.users);
-        });
+        $scope.reload_users();
       }
     });
   };
-  $scope.reload_ws();
   $scope.delete_project = function(project) {
     return ButtonsOnlyModalFactory.open('Delete Project', 'Are you sure you want to permanently delete this project?', ['Yes', 'No']).then(function(button) {
       if (button === 'Yes') {
@@ -421,10 +460,44 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
     editor.setCursor(editor.lineCount(), 0);
   };
 
-  $scope.users = [
-    {id: 0, name: 'Default User'}
-  ];
-  $scope.active_user = $scope.users[0];
+
+/*
+  $scope.reload_users().then(
+    function(){
+    console.log($scope.users);
+    
+    //$scope.users = [
+    // {id: 0, name: 'Default User'}
+    //];
+
+    //scope.active_user = $scope.users[0];
+    //$scope.reload_ws();
+
+    if ($scope.active_user != null && $location.search('user', $scope.active_user.name) == null) {
+      console.log("setting user to default");
+      scope.active_user = $scope.users[0];
+    } else {
+      var ref2 = $scope.users;
+        for (var i = 0, len = ref2.length; i < len; i++) {
+          var user = ref2[i];
+          if (user.name === $location.search().user){
+            $scope.active_user = user;
+            break;
+          }
+        }
+    }
+  });
+*/
+  $scope.user_setup = function() {
+    $scope.reload_users();
+    $scope.users = [
+     {id: 0, name: 'Default User'}
+    ];
+
+    $scope.active_user = $scope.users[0];
+  };
+  $scope.user_setup();
+
 
   $scope.show_new_user_modal = function() {
     $('#new-user').modal('show');
@@ -472,7 +545,7 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
         projects_resource = (ref = app_catalog['Programs']) != null ? (ref1 = ref.web_api) != null ? ref1.projects : void 0 : void 0;
         if (!projects_resource) return;
         $http.delete(projects_resource.uri + '/users/' + username).success(function(data, status) {
-          if(status !== 204) throw new Error('Failed to create new user');
+          if(status !== 204) throw new Error('Failed to remove user');
           $scope.reload_ws().then(function () {
             $scope.active_user = $scope.users[0];
           });
@@ -483,9 +556,14 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
   }
 
   $scope.$watch('active_user', function(newValue, oldValue) {
+    console.log('$scope.$watch for active_user');
+    if (oldValue != null) console.log("active_user changed from " + oldValue.name + " to " + newValue.name);
     $scope.close_project();
     $scope.close_file();
     $scope.reload_ws();
+    $scope.reload_users();
+
+    $location.search('user', $scope.active_user.name);
   });
 
   compile = function(project_name) {
