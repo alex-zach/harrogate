@@ -321,7 +321,7 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
     return DownloadProjectModalFactory.open(project);
   };
   $scope.show_add_include_file_modal = function() {
-    return FilenameModalFactory.open('Create New Include File', 'Filename', ['.h'], 'Create').then(function(mData) {
+    return FilenameModalFactory.open('Create New Include File', 'Filename', ['.h', '.hpp'], 'Create').then(function(mData) {
       if ($scope.ws == null || $scope.project_resource == null) return;
 
       var file = {
@@ -338,7 +338,7 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
   };
 
   $scope.show_add_source_file_modal = function() {
-    var language_array = ['.c'];
+    var language_array = ['.c', '.cpp'];
     if ($scope.project_resource.parameters.language === 'Python') {
       language_array = ['.py'];
     }
