@@ -45,7 +45,7 @@ WorkspaceManager = (function() {
 
   WorkspaceManager.prototype.update_workspace_path = function(path) {
     this.workspace_path = path;
-    Fs.writeFile(this.workspace_file_path, JSON.stringify(this.workspace_path, null, 2), 'utf8');
+    Fs.writeFile(this.workspace_file_path, JSON.stringify(this.workspace_path, null, 2), 'utf8', () => {});
   };
 
   return WorkspaceManager;
