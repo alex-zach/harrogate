@@ -16,3 +16,4 @@ obj
 *.suo
 *.tmp
 *.obj
+.idea/
