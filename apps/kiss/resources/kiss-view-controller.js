@@ -501,7 +501,7 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
       out += 'Linking\n';
       if (data.output.linking.error) {
         state = 'Compilation Failed';
-        out += data.output.linking.error + '\n===================\n';
+        out += data.output.linking.error.message ? data.output.linking.error.message : data.output.linking.stderr + '\n===================\n';
       } else {
         out += 'success\n===================\n';
       }

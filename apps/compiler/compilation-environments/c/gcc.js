@@ -28,7 +28,7 @@ module.exports = {
         else if (Path.extname(file.name) === '.cpp') {
           cmd = 'g++';
         }
-        cmd += ` -I"${project_resource.include_directory.path}" -I"${Config.ext_deps.include_path}" -L"${Config.ext_deps.lib_path}" -lwallaby -lm -Wall -c "${file.path}" -o "${Path.join(project_resource.bin_directory.path, file.name)}.o"`;
+        cmd += ` -I"${project_resource.include_directory.path}" -I"${Config.ext_deps.include_path}" -L"${Config.ext_deps.lib_path}" -Wall -c "${file.path}" -o "${Path.join(project_resource.bin_directory.path, file.name)}.o"`;
 
         promises.push(new Promise((resolve) => exec(cmd, (error, stdout, stderr) => {
           resolve({file: file.name, error, stdout, stderr});
@@ -43,7 +43,7 @@ module.exports = {
           }
         });
         if (can_link) {
-          let cmd = `g++ -o "${project_resource.binary.path}"`;
+          let cmd = `g++ -lwallaby -lm -o "${project_resource.binary.path}"`;
           Fs.readdirSync(project_resource.bin_directory.path).forEach(el => {
             cmd += ` "${Path.join(project_resource.bin_directory.path, el)}"`;
           });
