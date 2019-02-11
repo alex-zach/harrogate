@@ -128,7 +128,7 @@ File = (function() {
     if (content == null) {
       content = '';
     }
-    return Q.nfcall(FS.writeFile, this.path, content, encoding = encoding);
+    return Q.nfcall(FS.writeFile, this.path, content, encoding = encoding, () => {});
   };
 
   File.prototype.remove = function() {
