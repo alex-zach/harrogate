@@ -497,20 +497,25 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
     }).success(function(data, status, headers, config) {
       var ref;
       $scope.is_compiling = false;
-      if (data.result.error != null) {
-        $scope.compilation_state = 'Compilation Failed';
-        if (((ref = data.result.error) != null ? ref.message : void 0) != null) {
-          return $scope.compiler_output = 'Compilation Failed\n\n' + data.result.error.message;
-        } else {
-          return $scope.compiler_output = 'Compilation Failed\n\n' + data.result.stderr + data.result.stdout;
-        }
-      } else if (data.result.stderr) {
-        $scope.compilation_state = 'Compilation Succeeded with Warnings';
-        return $scope.compiler_output = 'Compilation Succeeded with Warnings\n\n' + data.result.stderr + data.result.stdout;
+      let state = 'Compilation succeeded', out = '';
+      out += 'Linking\n';
+      if (data.output.linking.error) {
+        state = 'Compilation Failed';
+        out += data.output.linking.error + '\n===================\n';
       } else {
-        $scope.compilation_state = 'Compilation succeeded';
-        return $scope.compiler_output = 'Compilation succeeded\n\n' + data.result.stdout;
+        out += 'success\n===================\n';
       }
+      data.output.fileoutputs.forEach(el => {
+        if (el.error) {
+          state = 'Compilation Failed';
+        } else if (el.stderr.length > 0) {
+          state = 'Compilation Succeeded with Warnings';
+        }
+        out += `Build ${el.file}\n` +
+               `${el.stderr ? el.stderr : 'success'}\n===================\n`;
+      });
+      $scope.compilation_state = state;
+      $scope.compiler_output = out;
     });
   };
   $scope.compile = function() {

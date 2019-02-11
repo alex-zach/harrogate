@@ -81,13 +81,7 @@ router.post('/', function(request, response, next) {
       } else if (language.toLowerCase() === 'python') {
         compilation_environment = require('../compilation-environments/python/python.js');
       }
-      return compilation_environment.compile(project_resource, function(error, stdout, stderr) {
-        var result;
-        result = {
-          stdout: stdout,
-          stderr: stderr,
-          error: error
-        };
+      return compilation_environment.compile(project_resource, function(output) {
         response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         response.setHeader('Pragma', 'no-cache');
         response.setHeader('Expires', '0');
@@ -95,7 +89,7 @@ router.post('/', function(request, response, next) {
           'Content-Type': 'application/json'
         });
         response.end("" + (JSON.stringify({
-          result: result
+          output
         })), 'utf8');
       });
     });
