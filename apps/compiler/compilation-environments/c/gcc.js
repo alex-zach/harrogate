@@ -16,12 +16,12 @@ module.exports = {
       }
       return project_resource.src_directory.get_children();
     }).then(function(src_files) {
-      let promises = [];
+      var promises = [];
       src_files.forEach((file) => {
         if (Path.basename(file.path).charAt(0) === '.') {
           return;
         }
-        let cmd;
+        var cmd;
         if (Path.extname(file.name) === '.c') {
           cmd = 'gcc';
         }
@@ -36,14 +36,14 @@ module.exports = {
       });
 
       Promise.all(promises).then(fileoutputs => {
-        let can_link = true;
+        var can_link = true;
         fileoutputs.forEach(el => {
           if (el.error) {
             can_link = false;
           }
         });
         if (can_link) {
-          let cmd = `g++ -lwallaby -lm -o "${project_resource.binary.path}"`;
+          var cmd = `g++ -lwallaby -lm -o "${project_resource.binary.path}"`;
           Fs.readdirSync(project_resource.bin_directory.path).forEach(el => {
             cmd += ` "${Path.join(project_resource.bin_directory.path, el)}"`;
           });

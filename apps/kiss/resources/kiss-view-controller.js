@@ -497,7 +497,7 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
     }).success(function(data, status, headers, config) {
       var ref;
       $scope.is_compiling = false;
-      let state = 'Compilation succeeded', out = '';
+      var state = 'Compilation succeeded', out = '';
       out += 'Linking\n';
       if (data.output.linking && data.output.linking.error) {
         state = 'Compilation Failed';
