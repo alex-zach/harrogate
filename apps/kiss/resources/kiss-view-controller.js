@@ -499,7 +499,7 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
       $scope.is_compiling = false;
       let state = 'Compilation succeeded', out = '';
       out += 'Linking\n';
-      if (data.output.linking.error) {
+      if (data.output.linking && data.output.linking.error) {
         state = 'Compilation Failed';
         out += data.output.linking.error.message ? data.output.linking.error.message : data.output.linking.stderr + '\n===================\n';
       } else {
@@ -508,7 +508,7 @@ exports.controller = function($scope, $rootScope, $location, $http, $timeout, Ap
       data.output.fileoutputs.forEach(el => {
         if (el.error) {
           state = 'Compilation Failed';
-        } else if (el.stderr.length > 0) {
+        } else if (el.stderr.length > 0 && state !== 'Compilation Failed') {
           state = 'Compilation Succeeded with Warnings';
         }
         out += `Build ${el.file}\n` +
